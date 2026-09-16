@@ -1,0 +1,28 @@
+Third-party components and downloaded materials
+================================================
+
+Yamaha AG DSP Controller
+------------------------
+
+The Yamaha AG DSP Controller executable, installer archive, and Yamaha license
+remain Yamaha property. They are not included in this repository or its
+packages. The installer downloads them from Yamaha after the user reviews and
+accepts Yamaha's current terms:
+
+  EULA: https://usa.yamaha.com/support/updates/ag_dsp_win.html
+  Archive: https://usa.yamaha.com/files/download/software/6/827126/AG_DSP_Controller_v1100_win.zip
+  SHA-256: 2b2a7af814be568bf65885b9514b492565cdf0a9d42d0620ffe7ab24069de117
+
+Wine ALSA MIDI name shim
+------------------------
+
+`alsa-midi-name-shim.c` is original project code. CI builds it as a
+shared library and the launcher preloads it only for Wine. It changes
+the ALSA capability names needed by the original AG06/AG03 controller; it
+does not modify Yamaha's executable or MIDI messages.
+
+The shim presents Wine's `AG06/AG03 - AG06/AG03 MIDI 1` as `AG06/AG03`, which
+is the name expected by the unmodified Yamaha application. It is covered by
+this project's WTFPL license.
+
+This project is independent and is not affiliated with or endorsed by Yamaha.

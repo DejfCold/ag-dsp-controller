@@ -1,0 +1,10 @@
+*.zip
+*.so
+*.exe
+.rpmbuild/
+debian/.debhelper/
+debian/ag-dsp-controller/
+debian/ag-dsp-controller.debhelper.log
+debian/ag-dsp-controller.substvars
+debian/debhelper-build-stamp
+debian/files

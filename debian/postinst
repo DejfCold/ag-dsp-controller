@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+
+echo "AG DSP Controller setup is deferred until first launch."
+echo "Launch 'AG DSP Controller' to review Yamaha's license and install it."
+exit 0

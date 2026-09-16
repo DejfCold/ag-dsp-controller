@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	gcc -Wall -Wextra -Werror -shared -fPIC -O2 alsa-midi-name-shim.c -o alsa-midi-name-shim.so -ldl
+
+override_dh_auto_install:
+	install -D -m755 ag-dsp-controller.sh debian/ag-dsp-controller/usr/bin/ag-dsp-controller
+	install -D -m644 ag-dsp-controller.desktop debian/ag-dsp-controller/usr/share/applications/ag-dsp-controller.desktop
+	install -D -m755 install-yamaha-controller.sh debian/ag-dsp-controller/usr/libexec/ag-dsp-controller-install
+	install -D -m755 uninstall-ag-dsp-controller.sh debian/ag-dsp-controller/usr/libexec/ag-dsp-controller-uninstall
+	install -D -m644 alsa-midi-name-shim.so debian/ag-dsp-controller/usr/share/ag-dsp-controller/alsa-midi-name-shim.so
+	install -D -m644 LICENSE debian/ag-dsp-controller/usr/share/doc/ag-dsp-controller/copyright
+
+override_dh_shlibdeps:
+	dh_shlibdeps --exclude=alsa-midi-name-shim.so
+
+override_dh_strip:
+	dh_strip --exclude=alsa-midi-name-shim.so

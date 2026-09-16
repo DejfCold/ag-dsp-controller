@@ -1,0 +1,14 @@
+Source: ag-dsp-controller
+Section: sound
+Priority: optional
+Maintainer: DejfCold <dejfcold@dejfcold.cz>
+Build-Depends: debhelper-compat (= 13), gcc
+Standards-Version: 4.7.0
+Homepage: https://github.com/DejfCold/ag-dsp-controller
+
+Package: ag-dsp-controller
+Architecture: amd64
+Depends: ${misc:Depends}, wine, curl, unzip, util-linux, python3
+Recommends: zenity, policykit-1
+Description: Yamaha AG06/AG03 DSP Controller installer for Linux through Wine
+ Downloads Yamaha's controller after interactive license acceptance.

@@ -1,0 +1,109 @@
+name: Build and release packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  packages:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes debhelper dpkg-dev rpm build-essential gnupg
+
+      - name: Build DEB and RPM
+        env:
+          VERSION: ${{ startsWith(github.ref_name, 'v') && github.ref_name || '0.0.0' }}
+        run: |
+          VERSION="${VERSION#v}"
+          bash tests/test-packaging.sh
+          gcc -Wall -Wextra -Werror -shared -fPIC -O2 alsa-midi-name-shim.c -o alsa-midi-name-shim.so -ldl
+          sed -i "1s/ag-dsp-controller ([^)]*)/ag-dsp-controller (${VERSION}-1)/" debian/changelog
+          dpkg-buildpackage --build=binary --no-sign
+          mkdir -p .rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS,tmp}
+          cp ag-dsp-controller.sh ag-dsp-controller.desktop install-yamaha-controller.sh uninstall-ag-dsp-controller.sh LICENSE THIRD_PARTY_NOTICES alsa-midi-name-shim.so .rpmbuild/SOURCES/
+          cp rpm/ag-dsp-controller.spec .rpmbuild/SPECS/
+          rpmbuild -bb .rpmbuild/SPECS/ag-dsp-controller.spec --define "_topdir $PWD/.rpmbuild" --define "_rpmdir $PWD/.rpmbuild/RPMS"
+          mkdir -p dist
+          cp ../ag-dsp-controller_*.deb .rpmbuild/RPMS/*/*.rpm dist/
+
+      - name: Sign packages and export verification key
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          test -n "${GPG_PRIVATE_KEY}" || {
+            echo "GPG_PRIVATE_KEY GitHub secret is not configured." >&2
+            exit 1
+          }
+          export GNUPGHOME="$PWD/.work-release-gnupg"
+          mkdir -m700 -p "$GNUPGHOME"
+          printf '%s' "${GPG_PRIVATE_KEY}" | gpg --batch --import
+          FINGERPRINT="$(gpg --batch --with-colons --list-secret-keys | awk -F: '$1 == "fpr" { print $10; exit }')"
+          test -n "${FINGERPRINT}"
+          gpg --batch --armor --export "${FINGERPRINT}" > dist/ag-dsp-controller-signing-key.asc
+          rpm --import dist/ag-dsp-controller-signing-key.asc
+          printf '%%_gpg_name %s\n%%__gpg /usr/bin/gpg\n' "${FINGERPRINT}" > "$HOME/.rpmmacros"
+          for package in dist/*.rpm; do
+            rpmsign --addsign "${package}"
+            rpm --checksig --verbose "${package}"
+          done
+          for package in dist/*.deb dist/*.rpm; do
+            gpg --batch --yes --armor --detach-sign "${package}"
+          done
+          VERSION="${GITHUB_REF_NAME#v}"
+          RPM_ASSET="$(basename "$(find dist -maxdepth 1 -type f -name '*.rpm' -print -quit)")"
+          DEB_ASSET="$(basename "$(find dist -maxdepth 1 -type f -name '*.deb' -print -quit)")"
+          test -n "${RPM_ASSET}" -a -n "${DEB_ASSET}"
+          printf '%s\n' \
+            '## Verification and installation' \
+            '' \
+            '### Fedora' \
+            '' \
+            'Download the key, verify its exact fingerprint, import it into RPM, and let DNF download and verify the RPM directly:' \
+            '' \
+            '```bash' \
+            "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/ag-dsp-controller-signing-key.asc &&" \
+            "gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&" \
+            "gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc | grep -Fq '${FINGERPRINT}' &&" \
+            "sudo rpm --import ag-dsp-controller-signing-key.asc &&" \
+            "sudo dnf install https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/${RPM_ASSET}" \
+            '```' \
+            '' \
+            '### Debian or Ubuntu' \
+            '' \
+            "Download the key and ${DEB_ASSET}, verify the exact key fingerprint and detached package signature, then install it with APT:" \
+            '' \
+            '```bash' \
+            "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/ag-dsp-controller-signing-key.asc &&" \
+            "gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&" \
+            "gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc | grep -Fq '${FINGERPRINT}' &&" \
+            'gpg --import ag-dsp-controller-signing-key.asc &&' \
+            "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/${DEB_ASSET} &&" \
+            "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/${DEB_ASSET}.asc &&" \
+            "gpg --verify ${DEB_ASSET}.asc ${DEB_ASSET} &&" \
+            "sudo apt install ./${DEB_ASSET}" \
+            '```' \
+            > .work-release-notes.md
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ag-dsp-controller-packages
+          path: dist/*
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" dist/* --notes-file .work-release-notes.md --verify-tag

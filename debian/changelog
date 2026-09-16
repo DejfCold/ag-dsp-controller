@@ -1,0 +1,5 @@
+ag-dsp-controller (1.0.0-1) unstable; urgency=medium
+
+  * Initial Debian package.
+
+ -- DejfCold <dejfcold@dejfcold.cz>  Wed, 16 Sep 2026 21:40:00 +0200
