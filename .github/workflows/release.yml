@@ -70,14 +70,16 @@ jobs:
             '' \
             '### Fedora' \
             '' \
-            'Download the key, verify its exact fingerprint, import it into RPM, and let DNF download and verify the RPM directly:' \
+            'Download the key and RPM, verify the exact key fingerprint and RPM signature, then install the verified file with DNF:' \
             '' \
             '```bash' \
             "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/ag-dsp-controller-signing-key.asc &&" \
             "gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&" \
             "gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc | grep -Fq '${FINGERPRINT}' &&" \
             "sudo rpm --import ag-dsp-controller-signing-key.asc &&" \
-            "sudo dnf install https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/${RPM_ASSET}" \
+            "curl --fail --location --remote-name https://github.com/DejfCold/ag-dsp-controller/releases/download/${GITHUB_REF_NAME}/${RPM_ASSET} &&" \
+            "rpm --checksig --verbose ${RPM_ASSET} &&" \
+            "sudo dnf install ./${RPM_ASSET}" \
             '```' \
             '' \
             '### Debian or Ubuntu' \

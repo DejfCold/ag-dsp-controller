@@ -148,14 +148,18 @@ gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&
 gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc \
   | grep -Fq 'EDA7A7B27EF69B159FD4382DF143A790A52B70B9' &&
 sudo rpm --import ag-dsp-controller-signing-key.asc &&
+curl --fail --location --remote-name \
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller-1.0.1-1.x86_64.rpm &&
+rpm --checksig --verbose ag-dsp-controller-1.0.1-1.x86_64.rpm &&
 sudo dnf install \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller-1.0.1-1.x86_64.rpm
+  ./ag-dsp-controller-1.0.1-1.x86_64.rpm
 ```
 
-The RPM carries a native RPM signature, so `rpm --import` makes the key
-available to RPM and DNF verifies the package before installing it. If you
-prefer to inspect the file first, download it and run `rpm --checksig --verbose`
-before installing it with `dnf`.
+The RPM carries a native RPM signature. `rpm --import` makes the key available
+to RPM, and `rpm --checksig --verbose` verifies the package before DNF installs
+it. DNF may report that OpenPGP checks were skipped when installing a direct
+URL or local `@commandline` package, so keep the explicit `rpm --checksig`
+step.
 
 ### Debian or Ubuntu
 
