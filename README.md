@@ -114,7 +114,8 @@ For a packaged installation:
 | Path | Purpose |
 | --- | --- |
 | `/usr/bin/ag-dsp-controller` | User-facing launcher |
-| `/usr/share/ag-dsp-controller/` | Unmodified executable, preset data, and shim |
+| `/usr/share/ag-dsp-controller/current/` | Active unmodified executable, preset data, and shim |
+| `/usr/share/ag-dsp-controller/releases/` | Versioned installed releases |
 | `/usr/libexec/ag-dsp-controller-install` | Root installer helper |
 | `/var/lib/ag-dsp-controller/` | Accepted EULA hash and downloaded license copy |
 | `~/.local/share/ag-dsp-controller/wine-prefix/` | Per-user writable Wine state |
@@ -250,6 +251,10 @@ The unmodified Yamaha executable is run with the project-owned ALSA
 shim. It narrows Wine's generated MIDI client name and presents the AG06/AG03
 port under the short name expected by the controller. The shim changes neither
 MIDI messages nor Yamaha's executable.
+
+The compatibility approach is based on the original implementation by Dale
+Whinham in his AG DSP Controller patch. This repository does not redistribute
+that patch; its shim is maintained as independent project code.
 
 Development of this repository was aided by **GPT-5.6-Luna Medium**, an
 OpenAI Codex assistant based on GPT-5.
