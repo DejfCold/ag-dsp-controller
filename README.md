@@ -136,20 +136,20 @@ it; the current release key fingerprint is:
 EDA7 A7B2 7EF6 9B15 9FD4 382D F143 A790 A52B 70B9
 ```
 
-For a release tagged `v1.0.0`, choose the complete instructions for your
+For a release tagged `v1.0.1`, choose the complete instructions for your
 distribution.
 
 ### Fedora
 
 ```bash
 curl --fail --location --remote-name \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.0/ag-dsp-controller-signing-key.asc &&
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller-signing-key.asc &&
 gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&
 gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc \
   | grep -Fq 'EDA7A7B27EF69B159FD4382DF143A790A52B70B9' &&
 sudo rpm --import ag-dsp-controller-signing-key.asc &&
 sudo dnf install \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.0/ag-dsp-controller-1.0.0-1.x86_64.rpm
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller-1.0.1-1.x86_64.rpm
 ```
 
 The RPM carries a native RPM signature, so `rpm --import` makes the key
@@ -163,18 +163,18 @@ Download the public key and the matching DEB plus its detached signature:
 
 ```bash
 curl --fail --location --remote-name \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.0/ag-dsp-controller-signing-key.asc &&
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller-signing-key.asc &&
 gpg --show-keys --with-fingerprint ag-dsp-controller-signing-key.asc &&
 gpg --show-keys --with-colons ag-dsp-controller-signing-key.asc \
   | grep -Fq 'EDA7A7B27EF69B159FD4382DF143A790A52B70B9' &&
 gpg --import ag-dsp-controller-signing-key.asc &&
 curl --fail --location --remote-name \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.0/ag-dsp-controller_1.0.0-1_amd64.deb &&
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller_1.0.1-1_amd64.deb &&
 curl --fail --location --remote-name \
-  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.0/ag-dsp-controller_1.0.0-1_amd64.deb.asc &&
-gpg --verify ag-dsp-controller_1.0.0-1_amd64.deb.asc \
-  ag-dsp-controller_1.0.0-1_amd64.deb &&
-sudo apt install ./ag-dsp-controller_1.0.0-1_amd64.deb
+  https://github.com/DejfCold/ag-dsp-controller/releases/download/v1.0.1/ag-dsp-controller_1.0.1-1_amd64.deb.asc &&
+gpg --verify ag-dsp-controller_1.0.1-1_amd64.deb.asc \
+  ag-dsp-controller_1.0.1-1_amd64.deb &&
+sudo apt install ./ag-dsp-controller_1.0.1-1_amd64.deb
 ```
 
 The DEB signature is detached because APT does not use a detached signature
@@ -235,7 +235,7 @@ rpmbuild -bb .rpmbuild/SPECS/ag-dsp-controller.spec \
 The GitHub Actions workflow performs this staging in a clean checkout.
 
 The GitHub Actions workflow performs the same package-only build on Ubuntu
-24.04. A tag such as `v1.0.0` creates a GitHub release and attaches the DEB
+24.04. A tag such as `v1.0.1` creates a GitHub release and attaches the DEB
 and RPM artifacts. The workflow does not fetch Yamaha's binary; installation
 on the user's machine does that after license acceptance.
 

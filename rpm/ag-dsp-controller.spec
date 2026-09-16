@@ -1,5 +1,5 @@
 Name:           ag-dsp-controller
-%global pkgver  1.0.0
+%global pkgver  1.0.1
 Version:        %{pkgver}
 Release:        1%{?dist}
 Summary:        Yamaha AG06/AG03 DSP Controller installer for Linux
@@ -56,5 +56,7 @@ fi
 %doc %{_docdir}/%{name}/THIRD_PARTY_NOTICES
 
 %changelog
+* Wed Sep 16 2026 DejfCold <dejfcold@dejfcold.cz> - 1.0.1-1
+- Correct documentation and installer file permissions.
 * Wed Sep 16 2026 DejfCold <dejfcold@dejfcold.cz> - 1.0.0-1
 - Add native RPM packaging and deferred Yamaha setup.

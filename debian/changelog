@@ -1,3 +1,9 @@
+ag-dsp-controller (1.0.1-1) unstable; urgency=medium
+
+  * Correct documentation and installer file permissions.
+
+ -- DejfCold <dejfcold@dejfcold.cz>  Wed, 16 Sep 2026 23:00:00 +0200
+
 ag-dsp-controller (1.0.0-1) unstable; urgency=medium
 
   * Initial Debian package.
